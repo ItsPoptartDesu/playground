@@ -9,10 +9,13 @@ public class GameEntry : MonoBehaviour
     [SerializeField] private LevelBuilder _levelBuilder;
     [SerializeField] private ObjectManager _objectManager;
     [SerializeField] private UIManager myUIManager;
+    private GridManager gridManager; // Inject via Awake/Start
+    
     public ObjectManager GetObjectManager() { return _objectManager; }
+    public GridManager GetGridManager() { return gridManager; } 
+
     public int Width = 3;
     public int Height = 3;
-
     // Public property to access the singleton instance
     public static GameEntry Instance
     {

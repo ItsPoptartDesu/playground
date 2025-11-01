@@ -12,7 +12,7 @@ public class ObjectManager : MonoBehaviour
     [SerializeField] private List<HexExpression> HexExpressions;
     [SerializeField] private Material DEFAULT_Mat;
     [SerializeField] private GameObject TestHero;
-    public Material GetDefaultMat() { return DEFAULT_Mat; } 
+    public Material GetDefaultMat() { return DEFAULT_Mat; }
     private void Awake()
     {
         ObjectsInScene = new Dictionary<ObjExpression , List<GameObject>>();
@@ -30,7 +30,22 @@ public class ObjectManager : MonoBehaviour
         }
         return GameEntry.Instance.GetObjectManager().GetDefaultMat();
     }
-    //private List<GameObject> Map
+    public void SpawnPlayableUnit(string _name)
+    {
+        if (_name == null)
+        {
+            List<GameObject> Tiles = ObjectsInScene[ObjExpression.HEXTILE];
+            int RandomTileIndex = UnityEngine.Random.Range(0 , Tiles.Count);
+            GameObject TileParent = Tiles[RandomTileIndex];
+            GameObject newlySpawned = Instantiate(TestHero , TileParent.transform);
+            if (!ObjectsInScene.ContainsKey(ObjExpression.HERO))
+                ObjectsInScene[ObjExpression.HERO] = new List<GameObject> { newlySpawned };
+            else
+                ObjectsInScene[ObjExpression.HERO].Add(newlySpawned);
+
+            return;
+        }
+    }
     public GameObject CreateNewHexTile()
     {
         if (_hexTile == null)
@@ -52,11 +67,12 @@ public class ObjectManager : MonoBehaviour
     }
     public void ShutDown()
     {
-        Debug.Log("Remove added items");
+        Debug.Log("Removing all Hex Tiles");
         foreach (GameObject obj in ObjectsInScene[ObjExpression.HEXTILE])
         {
             Destroy(obj);
         }
+        ObjectsInScene[ObjExpression.HEXTILE].Clear();
         hexSize = -1f;
     }
 

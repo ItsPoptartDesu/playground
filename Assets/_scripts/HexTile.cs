@@ -16,6 +16,7 @@ public struct HexExpression
     public TerrainExpression m_TerrainExpression;
     public Material m_Material;
 }
+
 public class HexTile : ObjectTags, ISelectable
 {
     [Header("Selectable")]
@@ -23,9 +24,16 @@ public class HexTile : ObjectTags, ISelectable
     [SerializeField] private Renderer highlightRenderer; // e.g., outline material
     public bool IsSelectable => true; // Always selectable, or check distance/ownership
     public Vector3 WorldPosition => transform.position;
+
     [Space(2f)]
     [Header("HexTile")]
     [SerializeField] TerrainExpression myTerrainExpression = TerrainExpression.DEFAULT_TILE;
+    public int height = 0; // Stacked tiles increase this
+    public GameObject heldObject; // Unit or stacked tile (check type)
+    public TileEffectData effectData; // Assign in Inspector/prefab
+    public bool IsOccupied => heldObject != null && !IsStackable(heldObject); // Can't move to occupied
+    private bool IsStackable(GameObject obj) => obj.GetComponent<HexTile>() != null; // Allow stacking tiles for height
+    public int q, r;
     [SerializeField] ParticleSystem onSelectParticles;
     [SerializeField] Transform UnitAttachPoint;
     #region Selectable
@@ -47,6 +55,32 @@ public class HexTile : ObjectTags, ISelectable
     }
     #endregion
 
+    public float GetMoveCost(HeroStats mover , HexTile fromTile)
+    {
+        float baseCost = 1f; // Default hex distance
+        if (effectData != null)
+        {
+            baseCost *= effectData.moveCostMultiplier; // Slow/speed
+            if (effectData.blocksMovement) return Mathf.Infinity; // Impassable
+            // One-way: Check if entering from allowed dir (extend with fromTile)
+        }
+
+        // Height cost: Delta height * climb penalty (unless flying)
+        int heightDelta = height - fromTile.height;
+        if (heightDelta > 0 && heightDelta > mover.ClimbAbility)
+            return Mathf.Infinity; // Too steep
+        baseCost += heightDelta > 0 ? heightDelta * 0.5f : 0f; // Extra cost for climbing
+
+        return baseCost;
+    }
+
+    public void ApplyEffects(Hero unit)
+    {
+        if (effectData == null) return;
+        //if (effectData.damagePerTurn > 0)
+        //    unit.TakeDamage(effectData.damagePerTurn); // DoT
+        // Future: Slow (reduce unit speed temp), etc.
+    }
     public TerrainExpression GetTerrainExpression() { return myTerrainExpression; }
     public void UpdateTerrainExpression(TerrainExpression _type)
     {

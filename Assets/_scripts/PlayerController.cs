@@ -70,9 +70,15 @@ public class PlayerController : MonoBehaviour
         playerInput.Testing.Click.performed += OnClick;
         playerInput.Testing.Deselect.performed += _ => DeselectAll();
         CurrentSelections = new ISelectable[2];
+
+        playerInput.Testing.Spawn.performed += SpawnPlayable;
     }
 
     #region Selection
+    private void SpawnPlayable(InputAction.CallbackContext context)
+    {
+        GameEntry.Instance.GetObjectManager().SpawnPlayableUnit(null);
+    }
     private void OnClick(InputAction.CallbackContext context)
     {
         Debug.Log("PlayerController OnClick");
@@ -144,11 +150,6 @@ public class PlayerController : MonoBehaviour
                 CurrentSelections[i] = null;
             }
         }
-        //if (CurrentSelections[moveSelected] != null)
-        //{
-        //    CurrentSelections[moveSelected].OnDeselect();
-        //    CurrentSelections[moveSelected] = null;
-        //}
         CurrentState = SelectionState.Idle;
         OnStateChanged?.Invoke(CurrentState);
         OnDeselected?.Invoke();

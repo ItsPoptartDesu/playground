@@ -1052,6 +1052,15 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Spawn"",
+                    ""type"": ""Button"",
+                    ""id"": ""cf39cfef-0ded-438c-bd37-d95f98c8213f"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -1068,11 +1077,33 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
                 },
                 {
                     ""name"": """",
+                    ""id"": ""1cc11825-848e-409c-9a25-898b3db32ad5"",
+                    ""path"": ""<Keyboard>/2"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""BuildLevel"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
                     ""id"": ""c3d6a495-287c-418f-aaa2-e6053de9e177"",
                     ""path"": ""<Keyboard>/o"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": "";Keyboard&Mouse"",
+                    ""action"": ""BlowUp"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""13e60969-bec9-4212-8308-6ab1b99c22ef"",
+                    ""path"": ""<Keyboard>/1"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
                     ""action"": ""BlowUp"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
@@ -1107,6 +1138,28 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""groups"": "";Keyboard&Mouse"",
                     ""action"": ""Deselect"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""d1909084-6770-4110-bc31-b30c071ff848"",
+                    ""path"": ""<Keyboard>/r"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";Keyboard&Mouse"",
+                    ""action"": ""Spawn"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""84db34e3-a66b-417f-8503-b6bd7f028ec4"",
+                    ""path"": ""<Keyboard>/3"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Spawn"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -1205,6 +1258,7 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         m_Testing_BlowUp = m_Testing.FindAction("BlowUp", throwIfNotFound: true);
         m_Testing_Click = m_Testing.FindAction("Click", throwIfNotFound: true);
         m_Testing_Deselect = m_Testing.FindAction("Deselect", throwIfNotFound: true);
+        m_Testing_Spawn = m_Testing.FindAction("Spawn", throwIfNotFound: true);
     }
 
     ~@InputSystem_Actions()
@@ -1505,6 +1559,7 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
     private readonly InputAction m_Testing_BlowUp;
     private readonly InputAction m_Testing_Click;
     private readonly InputAction m_Testing_Deselect;
+    private readonly InputAction m_Testing_Spawn;
     public struct TestingActions
     {
         private @InputSystem_Actions m_Wrapper;
@@ -1513,6 +1568,7 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         public InputAction @BlowUp => m_Wrapper.m_Testing_BlowUp;
         public InputAction @Click => m_Wrapper.m_Testing_Click;
         public InputAction @Deselect => m_Wrapper.m_Testing_Deselect;
+        public InputAction @Spawn => m_Wrapper.m_Testing_Spawn;
         public InputActionMap Get() { return m_Wrapper.m_Testing; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -1534,6 +1590,9 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
             @Deselect.started += instance.OnDeselect;
             @Deselect.performed += instance.OnDeselect;
             @Deselect.canceled += instance.OnDeselect;
+            @Spawn.started += instance.OnSpawn;
+            @Spawn.performed += instance.OnSpawn;
+            @Spawn.canceled += instance.OnSpawn;
         }
 
         private void UnregisterCallbacks(ITestingActions instance)
@@ -1550,6 +1609,9 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
             @Deselect.started -= instance.OnDeselect;
             @Deselect.performed -= instance.OnDeselect;
             @Deselect.canceled -= instance.OnDeselect;
+            @Spawn.started -= instance.OnSpawn;
+            @Spawn.performed -= instance.OnSpawn;
+            @Spawn.canceled -= instance.OnSpawn;
         }
 
         public void RemoveCallbacks(ITestingActions instance)
@@ -1643,5 +1705,6 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         void OnBlowUp(InputAction.CallbackContext context);
         void OnClick(InputAction.CallbackContext context);
         void OnDeselect(InputAction.CallbackContext context);
+        void OnSpawn(InputAction.CallbackContext context);
     }
 }
