@@ -66,7 +66,7 @@ public class PlayerController : MonoBehaviour
         PTesting = playerInput.Testing.BuildLevel;
         PTesting.Enable();
         PTesting.performed += BuildLevel;
-       
+
         playerInput.Testing.Click.performed += OnClick;
         playerInput.Testing.Deselect.performed += _ => DeselectAll();
         CurrentSelections = new ISelectable[2];
@@ -82,17 +82,41 @@ public class PlayerController : MonoBehaviour
     private void OnClick(InputAction.CallbackContext context)
     {
         Debug.Log("PlayerController OnClick");
-        if (CurrentState == SelectionState.Idle || CurrentState == SelectionState.TileSelected)
+        HandleGenericClick();
+        //if (CurrentState == SelectionState.Idle || CurrentState == SelectionState.TileSelected)
+        //{
+        //    HandleHexClick();
+        //}
+        //else if (CurrentState == SelectionState.UnitSelected)
+        //{
+        //    // For unit actions: Raycast for targets (e.g., enemy hex/unit)
+        //    HandleActionClick();
+        //}
+    }
+    public void HandleGenericClick()
+    {
+        if (!Physics.Raycast(mainCamera.ScreenPointToRay(Mouse.current.position.ReadValue()) , out RaycastHit hit , Mathf.Infinity , tileLayerMask))
+            return; // Missed any tile
+
+        HexTile hitTile = hit.collider.GetComponent<HexTile>();
+        if (hitTile == null) return;
+        // Check for unit on tile
+        Collider unitCollider = hitTile.GetComponentInChildren<Collider>(); // Assumes unit is child or same hex
+        ISelectable newSelection = unitCollider?.GetComponent<ISelectable>() ?? hitTile as ISelectable;
+
+        //valid tile selection
+        if (newSelection != null && newSelection.IsSelectable)
         {
-            HandleHexClick();
-        }
-        else if (CurrentState == SelectionState.UnitSelected)
-        {
-            // For unit actions: Raycast for targets (e.g., enemy hex/unit)
-            HandleActionClick();
+            if (hitTile.heldObject != null)
+            {
+                Select(hitTile.heldObject.GetComponent<ISelectable>());
+            }
+            else
+            {
+                Select(newSelection);
+            }
         }
     }
-
     private void HandleHexClick()
     {
         if (!Physics.Raycast(mainCamera.ScreenPointToRay(Mouse.current.position.ReadValue()) , out RaycastHit hit , Mathf.Infinity , tileLayerMask))
@@ -145,7 +169,8 @@ public class PlayerController : MonoBehaviour
     {
         for (int i = 0; i <= moveSelected; i++)
         {
-            if (CurrentSelections[i] != null) {
+            if (CurrentSelections[i] != null)
+            {
                 CurrentSelections[i].OnDeselect();
                 CurrentSelections[i] = null;
             }

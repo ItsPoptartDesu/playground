@@ -67,7 +67,7 @@ public class HexTile : ObjectTags, ISelectable
 
         // Height cost: Delta height * climb penalty (unless flying)
         int heightDelta = height - fromTile.height;
-        if (heightDelta > 0 && heightDelta > mover.ClimbAbility)
+        if (heightDelta > 0 && heightDelta > mover.CurrentClimbDistance)
             return Mathf.Infinity; // Too steep
         baseCost += heightDelta > 0 ? heightDelta * 0.5f : 0f; // Extra cost for climbing
 

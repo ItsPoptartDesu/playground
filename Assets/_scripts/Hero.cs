@@ -6,26 +6,43 @@ using UnityEngine.Events;
 public interface IMovable
 {
     //move length inpact
-    int HeroRangeImpact { get; }
+    int MaxMoveDistanceAllowed { get; set; }
     // Max height delta
-    float ClimbAbility { get; } 
-    // Optional: bool CanFly, CanSwim, etc.
+    int ClimbAbility { get; set; }
+    // Optional: uint CanFly, CanSwim, etc. 
 }
+[System.Serializable]
 public struct HeroStats
 {
-    public string HeroName { get; private set; }
-    public int HeroMoveRange { get; private set; }
-    public int MoveSpeed { get; set; } // Heroscape-style
-    public float ClimbAbility { get; }
+    public string HeroName;
+    public int CurrentMoveDistance;
+    public int MaxMoveDistanceAllowed;
+    public int MaxClimbDistance;
+    public int CurrentClimbDistance;
+    public HeroStats(string _name , int _maxDistance , int _maxClimb)
+    {
+        HeroName = _name;
+        CurrentMoveDistance = MaxMoveDistanceAllowed = _maxDistance;
+        CurrentClimbDistance = MaxClimbDistance = _maxClimb;
+    }
+    public void TurnReset()
+    {
+        CurrentClimbDistance = MaxClimbDistance;
+        CurrentMoveDistance = MaxMoveDistanceAllowed;
+    }
 }
 
-public class Hero : ObjectTags
+public class Hero : ObjectTags, ISelectable
 {
     public HeroStats myStats;
     // Actions: Called from SelectionManager.HandleActionClick() or UI buttons
     public void Attack(Hero target) { /* CombatSystem.Resolve() */ }
     public void ShowInfo() { /* UI popup with stats */ }
     public HexTile CurrentTile { get; set; }
+
+    public bool IsSelectable => throw new System.NotImplementedException();
+
+    public Vector3 WorldPosition => throw new System.NotImplementedException();
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -37,12 +54,20 @@ public class Hero : ObjectTags
     {
 
     }
-    
+
+    public void Initiate(string _name , int _moveD , int _climbD)
+    {
+        myStats = new HeroStats(_name , _moveD , _climbD);
+    }
+    public void EndTurn()
+    {
+        myStats.TurnReset();
+    }
 
     public void MoveTo(HexTile target)
     {
         List<HexTile> path = GameEntry.Instance.GetGridManager().FindPath(CurrentTile , target , myStats);
-        if (path == null || path.Count > myStats.MoveSpeed + 1) return; // +1 for start tile
+        if (path == null || path.Count > myStats.MaxMoveDistanceAllowed + 1) return; // +1 for start tile
 
         // Animate along path (e.g., coroutine with Lerp)
         StartCoroutine(MoveAlongPath(path));
@@ -56,6 +81,19 @@ public class Hero : ObjectTags
             tile.ApplyEffects(this); // DoT/slow on enter
             yield return new WaitForSeconds(0.5f); // Animate
         }
-        myStats.MoveSpeed -= path.Count - 1; // Deduct moves
+        myStats.CurrentMoveDistance -= path.Count - 1; // Deduct moves
+    }
+
+    public void OnSelect(UnityEvent onSelectedEvent = null)
+    {
+        Debug.Log(" ");
+        Debug.Log(" ");
+        Debug.Log($"{myStats.HeroName} is being Selected");
+        Debug.Log($"{myStats}");
+    }
+
+    public void OnDeselect()
+    {
+        Debug.Log($"{myStats.HeroName} is being deselected");
     }
 }

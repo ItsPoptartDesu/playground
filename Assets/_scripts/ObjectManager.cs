@@ -1,6 +1,9 @@
-using UnityEngine;
-using System.Collections.Generic;
 using ObjectTag;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using Unity.Mathematics;
+using UnityEngine;
 
 public class ObjectManager : MonoBehaviour
 {
@@ -38,6 +41,12 @@ public class ObjectManager : MonoBehaviour
             int RandomTileIndex = UnityEngine.Random.Range(0 , Tiles.Count);
             GameObject TileParent = Tiles[RandomTileIndex];
             GameObject newlySpawned = Instantiate(TestHero , TileParent.transform);
+            Tiles[RandomTileIndex].GetComponent<HexTile>().heldObject = newlySpawned;
+            string name = RandomString(7);
+            int moveD = UnityEngine.Random.Range(1 , 5);
+            int climbD = UnityEngine.Random.Range(0 , 2);
+
+            newlySpawned.GetComponent<Hero>().Initiate(name , moveD , climbD);
             if (!ObjectsInScene.ContainsKey(ObjExpression.HERO))
                 ObjectsInScene[ObjExpression.HERO] = new List<GameObject> { newlySpawned };
             else
@@ -45,6 +54,12 @@ public class ObjectManager : MonoBehaviour
 
             return;
         }
+    }
+    public string RandomString(int length)
+    {
+        const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+        return new string(Enumerable.Repeat(chars , length)
+            .Select(s => s[UnityEngine.Random.Range(0 , s.Length)]).ToArray());
     }
     public GameObject CreateNewHexTile()
     {
