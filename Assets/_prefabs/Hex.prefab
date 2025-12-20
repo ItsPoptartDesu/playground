@@ -87,6 +87,11 @@ MonoBehaviour:
       m_Calls: []
   highlightRenderer: {fileID: 2354165304079071587}
   myTerrainExpression: 4
+  height: 0
+  heldObject: {fileID: 0}
+  effectData: {fileID: 0}
+  q: 0
+  r: 0
   onSelectParticles: {fileID: 5549337653782718826}
   UnitAttachPoint: {fileID: 5770936037495326186}
 --- !u!64 &4438779737212194634
@@ -4869,7 +4874,7 @@ ParticleSystem:
     vectorLabel1_3: W
 --- !u!199 &6294451369575054743
 ParticleSystemRenderer:
-  serializedVersion: 6
+  serializedVersion: 7
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -4888,6 +4893,8 @@ ParticleSystemRenderer:
   m_RayTracingAccelStructBuildFlagsOverride: 0
   m_RayTracingAccelStructBuildFlags: 1
   m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -4909,9 +4916,11 @@ ParticleSystemRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+  m_MaskInteraction: 0
   m_RenderMode: 0
   m_MeshDistribution: 0
   m_SortMode: 0
@@ -4943,7 +4952,6 @@ ParticleSystemRenderer:
   m_MeshWeighting1: 1
   m_MeshWeighting2: 1
   m_MeshWeighting3: 1
-  m_MaskInteraction: 0
 --- !u!1001 &3993067236545537511
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -4995,7 +5003,7 @@ PrefabInstance:
     - target: {fileID: -7511558181221131132, guid: 08e85eba8e68b82429b9b8e624626ef1, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
-      objectReference: {fileID: 2100000, guid: ce394f44ea830a34e9a621def7ab058a, type: 2}
+      objectReference: {fileID: 2100000, guid: 6a7a2cdd797e8074c922d718c6968b92, type: 2}
     - target: {fileID: 919132149155446097, guid: 08e85eba8e68b82429b9b8e624626ef1, type: 3}
       propertyPath: m_Name
       value: HexS6

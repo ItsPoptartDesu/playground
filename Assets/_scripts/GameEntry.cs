@@ -1,7 +1,6 @@
 using UnityEngine;
 
-public class GameEntry : MonoBehaviour
-{
+public class GameEntry : MonoBehaviour {
     // Static instance for singleton pattern
     private static GameEntry _instance;
     private static readonly object _lock = new object();
@@ -10,32 +9,27 @@ public class GameEntry : MonoBehaviour
     [SerializeField] private ObjectManager _objectManager;
     [SerializeField] private UIManager myUIManager;
     private GridManager gridManager; // Inject via Awake/Start
-    
+    public LevelBuilder GetLevelBuilder() { return _levelBuilder; }
+
     public ObjectManager GetObjectManager() { return _objectManager; }
-    public GridManager GetGridManager() { return gridManager; } 
+    public GridManager GetGridManager() { return gridManager; }
 
     public int Width = 3;
     public int Height = 3;
     // Public property to access the singleton instance
-    public static GameEntry Instance
-    {
-        get
-        {
-            if (_applicationIsQuitting)
-            {
+    public static GameEntry Instance {
+        get {
+            if (_applicationIsQuitting) {
                 Debug.LogWarning("GameEntry Instance access attempted while application is quitting. Returning null.");
                 return null;
             }
 
-            lock (_lock)
-            {
-                if (_instance == null)
-                {
+            lock (_lock) {
+                if (_instance == null) {
                     // Look for existing instance in the scene
                     _instance = FindFirstObjectByType<GameEntry>();
 
-                    if (_instance == null)
-                    {
+                    if (_instance == null) {
                         // Create new GameObject with GameEntry component
                         GameObject singletonObject = new GameObject();
                         _instance = singletonObject.AddComponent<GameEntry>();
@@ -53,11 +47,9 @@ public class GameEntry : MonoBehaviour
     }
 
     // Optional: Example initialization method
-    private void Awake()
-    {
+    private void Awake() {
         // Prevent duplicate instances
-        if (_instance != null && _instance != this)
-        {
+        if (_instance != null && _instance != this) {
             Debug.LogWarning("GameEntry Another instance already exists. Destroying this duplicate.");
             Destroy(gameObject);
             return;
@@ -67,28 +59,23 @@ public class GameEntry : MonoBehaviour
         Initialize();
     }
 
-    private void Initialize()
-    {
+    private void Initialize() {
         Debug.Log("GameEntry Initialize system.");
         myUIManager.StartGame();
     }
 
     private GameEntry() { }
 
-    private void OnDestroy()
-    {
-        if (_instance == this)
-        {
+    private void OnDestroy() {
+        if (_instance == this) {
             _applicationIsQuitting = true;
         }
     }
-    public void BlowUp()
-    {
+    public void BlowUp() {
         _objectManager.ShutDown();
     }
-    public void Build()
-    {
+    public void Build() {
         Debug.Log($"Game Entry passing W:{Width} - H:{Height}");
-        _levelBuilder.Build(Width, Height);
+        _levelBuilder.Build(Width , Height);
     }
 }

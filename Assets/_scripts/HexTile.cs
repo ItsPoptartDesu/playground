@@ -2,23 +2,22 @@ using ObjectTag;
 using System;
 using UnityEngine;
 using UnityEngine.Events;
-public enum TerrainExpression
-{
+public enum TerrainExpression {
+    DIRT_TILE,
+    FOREST_TILE,
     GRASS_TILE,
-    WATER_TILE,
+    MOUNTAIN_TILE,
     SAND_TILE,
-    LAVA_TILE,
+    WATER_TILE,
     DEFAULT_TILE,
 }
 [Serializable]
-public struct HexExpression
-{
+public struct HexExpression {
     public TerrainExpression m_TerrainExpression;
     public Material m_Material;
 }
 
-public class HexTile : ObjectTags, ISelectable
-{
+public class HexTile : ObjectTags, ISelectable {
     [Header("Selectable")]
     [SerializeField] private UnityEvent onSelectedEvent; // Inspector-hookable for highlights
     [SerializeField] private Renderer highlightRenderer; // e.g., outline material
@@ -37,8 +36,7 @@ public class HexTile : ObjectTags, ISelectable
     [SerializeField] ParticleSystem onSelectParticles;
     [SerializeField] Transform UnitAttachPoint;
     #region Selectable
-    public void OnSelect(UnityEvent customEvent = null)
-    {
+    public void OnSelect(UnityEvent customEvent = null) {
         // Visual: Enable highlight
         Debug.Log($"{GetHexInfo()} : has been clicked on");
         if (highlightRenderer != null)
@@ -47,19 +45,16 @@ public class HexTile : ObjectTags, ISelectable
         customEvent?.Invoke();
     }
 
-    public void OnDeselect()
-    {
+    public void OnDeselect() {
         Debug.Log($"{GetHexInfo()} : has been deselected on");
         if (highlightRenderer != null)
             onSelectParticles.Stop();
     }
     #endregion
 
-    public float GetMoveCost(HeroStats mover , HexTile fromTile)
-    {
+    public float GetMoveCost(HeroStats mover , HexTile fromTile) {
         float baseCost = 1f; // Default hex distance
-        if (effectData != null)
-        {
+        if (effectData != null) {
             baseCost *= effectData.moveCostMultiplier; // Slow/speed
             if (effectData.blocksMovement) return Mathf.Infinity; // Impassable
             // One-way: Check if entering from allowed dir (extend with fromTile)
@@ -74,43 +69,55 @@ public class HexTile : ObjectTags, ISelectable
         return baseCost;
     }
 
-    public void ApplyEffects(Hero unit)
-    {
+    public void ApplyEffects(Hero unit) {
         if (effectData == null) return;
         //if (effectData.damagePerTurn > 0)
         //    unit.TakeDamage(effectData.damagePerTurn); // DoT
         // Future: Slow (reduce unit speed temp), etc.
     }
     public TerrainExpression GetTerrainExpression() { return myTerrainExpression; }
-    public void UpdateTerrainExpression(TerrainExpression _type)
-    {
+    public void UpdateTerrainExpression(TerrainExpression _type) {
         myTerrainExpression = _type;
         GetComponentInChildren<MeshRenderer>().sharedMaterial = GameEntry.Instance.GetObjectManager().GetHexTileMaterial(_type);
     }
-    public void Initialize(Vector3 pos , int x , int y , int z , TerrainExpression _t = TerrainExpression.GRASS_TILE)
-    {
+    public void Initialize(Vector3 pos , int x , int y , int z , TerrainExpression _t = TerrainExpression.GRASS_TILE) {
         transform.position = pos;
         transform.rotation = Quaternion.identity;
         SetHexInfo(x , y , z);
-        int tileSize = GameEntry.Instance.GetObjectManager().GetHexExpressionCount();
-        _t = (TerrainExpression)UnityEngine.Random.Range(0 , tileSize);
-        UpdateTerrainExpression(_t);
+        //int tileSize = GameEntry.Instance.GetObjectManager().GetHexExpressionCount();
+        //_t = (TerrainExpression)UnityEngine.Random.Range(0 , tileSize);
+        
+        LevelBuilder LB = GameEntry.Instance.GetLevelBuilder();
+        // Sample Perlin height at grid coordinates (x,z)
+        float height01 = LB.SampleHeight(x , z);
+        int elevation = LB.GetElevationFromHeight(height01);
+
+        // Set visual elevation (raise the tile)
+        Vector3 elevatedPos = pos + Vector3.up * elevation * LB.GetElevationStepHeight(); // define step height, e.g. 1f
+        transform.position = elevatedPos;
+
+        // Update y coordinate in your data if needed
+        SetHexInfo(x , elevation , z); // assuming you store elevation as y
+
+        // Decide terrain based on height
+        TerrainExpression terrain = LB.GetTerrainFromHeight(height01);
+
+        UpdateTerrainExpression(terrain);
+
+        // Optional: Raise/lower mesh or add cliff visuals based on neighbor differences later
         GetHexInfo();
     }
-    public override string GetHexInfo()
-    {
+    public override string GetHexInfo() {
         return $"{myTerrainExpression.ToString()} -----{base.GetHexInfo()}";
 
     }
     // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
+    void Start() {
 
     }
 
     // Update is called once per frame
-    void Update()
-    {
+    void Update() {
 
     }
 }

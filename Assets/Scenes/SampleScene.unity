@@ -290,6 +290,7 @@ MonoBehaviour:
   m_VerticalAlignment: 512
   m_textAlignment: 65535
   m_characterSpacing: 0
+  m_characterHorizontalScale: 1
   m_wordSpacing: 0
   m_lineSpacing: 0
   m_lineSpacingMax: 0
@@ -426,6 +427,7 @@ MonoBehaviour:
   m_VerticalAlignment: 256
   m_textAlignment: 65535
   m_characterSpacing: 0
+  m_characterHorizontalScale: 1
   m_wordSpacing: 0
   m_lineSpacing: 0
   m_lineSpacingMax: 0
@@ -596,7 +598,6 @@ MonoBehaviour:
   m_ScreenCoordScaleBias: {x: 0, y: 0, z: 0, w: 0}
   m_RequiresDepthTexture: 0
   m_RequiresColorTexture: 0
-  m_Version: 2
   m_TaaSettings:
     m_Quality: 3
     m_FrameInfluence: 0.1
@@ -604,6 +605,7 @@ MonoBehaviour:
     m_MipBias: 0
     m_VarianceClampScale: 0.9
     m_ContrastAdaptiveSharpening: 0
+  m_Version: 2
 --- !u!1 &407373769
 GameObject:
   m_ObjectHideFlags: 0
@@ -700,14 +702,14 @@ Light:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 410087039}
   m_Enabled: 1
-  serializedVersion: 11
+  serializedVersion: 12
   m_Type: 1
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_Intensity: 2
   m_Range: 10
   m_SpotAngle: 30
   m_InnerSpotAngle: 21.80208
-  m_CookieSize: 10
+  m_CookieSize2D: {x: 10, y: 10}
   m_Shadows:
     m_Type: 2
     m_Resolution: -1
@@ -784,17 +786,23 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 474bcb49853aa07438625e644c072ee6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_Version: 3
   m_UsePipelineSettings: 1
   m_AdditionalLightsShadowResolutionTier: 2
-  m_LightLayerMask: 1
-  m_RenderingLayers: 1
   m_CustomShadowLayers: 0
-  m_ShadowLayerMask: 1
-  m_ShadowRenderingLayers: 1
   m_LightCookieSize: {x: 1, y: 1}
   m_LightCookieOffset: {x: 0, y: 0}
   m_SoftShadowQuality: 1
+  m_RenderingLayersMask:
+    serializedVersion: 0
+    m_Bits: 1
+  m_ShadowRenderingLayersMask:
+    serializedVersion: 0
+    m_Bits: 1
+  m_Version: 4
+  m_LightLayerMask: 1
+  m_ShadowLayerMask: 1
+  m_RenderingLayers: 1
+  m_ShadowRenderingLayers: 1
 --- !u!1 &729751427
 GameObject:
   m_ObjectHideFlags: 0
@@ -843,8 +851,8 @@ MonoBehaviour:
   _levelBuilder: {fileID: 1949285950}
   _objectManager: {fileID: 1949285948}
   myUIManager: {fileID: 1361728408}
-  Width: 7
-  Height: 7
+  Width: 8
+  Height: 8
 --- !u!1 &832575517
 GameObject:
   m_ObjectHideFlags: 0
@@ -1110,6 +1118,7 @@ MonoBehaviour:
   m_VerticalAlignment: 4096
   m_textAlignment: 65535
   m_characterSpacing: 0
+  m_characterHorizontalScale: 1
   m_wordSpacing: 0
   m_lineSpacing: 0
   m_lineSpacingMax: 0
@@ -1593,14 +1602,18 @@ MonoBehaviour:
   _hexTile: {fileID: 5007942360335410728, guid: 073f454dc4635ef4c941ba4bc6f5cdaa, type: 3}
   LevelParent: {fileID: 1963714258}
   HexExpressions:
-  - m_TerrainExpression: 1
-    m_Material: {fileID: 2100000, guid: b9236fc511350b748926441c41999802, type: 2}
   - m_TerrainExpression: 0
+    m_Material: {fileID: 2100000, guid: a0de09e7e32dc254d8be934d0f800771, type: 2}
+  - m_TerrainExpression: 1
+    m_Material: {fileID: 2100000, guid: 99ac3bd2760237a4c99bd904b4696849, type: 2}
+  - m_TerrainExpression: 2
     m_Material: {fileID: 2100000, guid: 6a7a2cdd797e8074c922d718c6968b92, type: 2}
   - m_TerrainExpression: 3
     m_Material: {fileID: 2100000, guid: 157b3806fdb61d544b3f33656f6ee950, type: 2}
-  - m_TerrainExpression: 2
+  - m_TerrainExpression: 4
     m_Material: {fileID: 2100000, guid: 63bcc730860b44449b8d6f22464a3ca4, type: 2}
+  - m_TerrainExpression: 5
+    m_Material: {fileID: 2100000, guid: b9236fc511350b748926441c41999802, type: 2}
   DEFAULT_Mat: {fileID: 2100000, guid: aaa67a823c1b98744a78a483d24e3857, type: 2}
   TestHero: {fileID: 196035148807067404, guid: f9544520f58d1404cb3eb94f9b086771, type: 3}
 --- !u!4 &1949285949
@@ -1630,6 +1643,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 683b40eba2612234caa355b140eef429, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  baseTerrainWeights: {fileID: 11400000, guid: e3393c7be32c18546ba10a267f2cb88a, type: 2}
+  perlinHeightMapSettings: {fileID: 11400000, guid: f881263a505510044a240e87ae77932a, type: 2}
 --- !u!1 &1963714257
 GameObject:
   m_ObjectHideFlags: 0
