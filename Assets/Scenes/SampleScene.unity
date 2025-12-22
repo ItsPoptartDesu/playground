@@ -852,6 +852,7 @@ MonoBehaviour:
   _objectManager: {fileID: 1949285948}
   myUIManager: {fileID: 1361728408}
   myGridManager: {fileID: 1949285951}
+  UseSeed: 0
   MapSize: {x: 16, y: 16}
 --- !u!1 &832575517
 GameObject:
@@ -1605,18 +1606,10 @@ MonoBehaviour:
   HexExpressions:
   - m_TerrainExpression: 0
     m_Material: {fileID: 2100000, guid: a0de09e7e32dc254d8be934d0f800771, type: 2}
-  - m_TerrainExpression: 1
-    m_Material: {fileID: 2100000, guid: 99ac3bd2760237a4c99bd904b4696849, type: 2}
-  - m_TerrainExpression: 2
-    m_Material: {fileID: 2100000, guid: 6a7a2cdd797e8074c922d718c6968b92, type: 2}
-  - m_TerrainExpression: 3
-    m_Material: {fileID: 2100000, guid: 157b3806fdb61d544b3f33656f6ee950, type: 2}
-  - m_TerrainExpression: 4
-    m_Material: {fileID: 2100000, guid: 63bcc730860b44449b8d6f22464a3ca4, type: 2}
   - m_TerrainExpression: 5
     m_Material: {fileID: 2100000, guid: b9236fc511350b748926441c41999802, type: 2}
-  - m_TerrainExpression: 6
-    m_Material: {fileID: 2100000, guid: 1c3e4b01ac376894798d5fccaeb26524, type: 2}
+  - m_TerrainExpression: 2
+    m_Material: {fileID: 2100000, guid: 6a7a2cdd797e8074c922d718c6968b92, type: 2}
   DEFAULT_Mat: {fileID: 2100000, guid: aaa67a823c1b98744a78a483d24e3857, type: 2}
   TestHero: {fileID: 196035148807067404, guid: f9544520f58d1404cb3eb94f9b086771, type: 3}
 --- !u!4 &1949285949
@@ -1648,7 +1641,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   baseTerrainWeights: {fileID: 11400000, guid: e3393c7be32c18546ba10a267f2cb88a, type: 2}
   perlinHeightMapSettings: {fileID: 11400000, guid: f881263a505510044a240e87ae77932a, type: 2}
-  biomeSettings: {fileID: 11400000, guid: a1fb3815ac7fb29428e875c0787437ea, type: 2}
 --- !u!114 &1949285951
 MonoBehaviour:
   m_ObjectHideFlags: 0

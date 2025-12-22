@@ -18,5 +18,5 @@ MonoBehaviour:
   moistureScale: 0.1
   moistureOctaves: 5
   moisturePersistence: 0.1
-  useLatitudeTemperature: 1
+  useLatitudeTemperature: 0
   equatorHeatBonus: 0.3

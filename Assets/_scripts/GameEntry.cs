@@ -9,7 +9,7 @@ public class GameEntry : MonoBehaviour {
     [SerializeField] private ObjectManager _objectManager;
     [SerializeField] private UIManager myUIManager;
     [SerializeField] private GridManager myGridManager;
-
+    [SerializeField] private bool UseSeed = false;
     public LevelBuilder GetLevelBuilder() { return _levelBuilder; }
 
     public ObjectManager GetObjectManager() { return _objectManager; }
@@ -79,6 +79,8 @@ public class GameEntry : MonoBehaviour {
     }
     public void Build() {
         Debug.Log($"Game Entry passing W:{MapSize.x} - H:{MapSize.y}");
+        if (!UseSeed)
+            _levelBuilder.perlinHeightMapSettings.seed = 0;
         myGridManager.GenerateMap(MapSize.x , MapSize.y);
         //_levelBuilder.DecorateMap(MapSize.x , MapSize.y);
     }

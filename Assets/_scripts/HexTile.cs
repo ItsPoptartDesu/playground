@@ -1,7 +1,8 @@
-using ObjectTag;
+﻿using ObjectTag;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Runtime.Serialization;
 using UnityEngine;
 using UnityEngine.Events;
 public enum TerrainExpression {
@@ -94,29 +95,76 @@ public class HexTile : ObjectTags, ISelectable {
         transform.position = pos;
         transform.rotation = Quaternion.identity;
         SetHexInfo(x , y , z);
+
+        //TODO check if LB stores mapsize if not paass it along when you start the game.
         LevelBuilder LB = GameEntry.Instance.GetLevelBuilder();
         var ms = GameEntry.Instance.MapSize;
+
         // Sample Perlin height at grid coordinates (x,z)
         float height01 = LB.SampleHeight(x , z);
-        float temp01 = LB.SampleTemperature(x , z);
-        float moist01 = LB.SampleMoisture(x , z);
-        int elevation = LB.GetElevationFromHeight(height01);
 
-        // Set visual elevation (raise the tile)
-        Vector3 elevatedPos = pos + Vector3.up * elevation * LB.GetElevationStepHeight(); // define step height, e.g. 1f
-        transform.position = elevatedPos;
+        // Step 1: What does the player/editor want overall?
+        TerrainExpression desired = LB.baseTerrainWeights.GetRandomTerrain();
 
-        // Update y coordinate in your data if needed
-        SetHexInfo(x , elevation , z); // assuming you store elevation as y
+        // Step 2: How well does this fit the local environment?
+        float fitScore = CalculateFitScore(desired , height01);
 
-        // Decide terrain based on height
-        TerrainExpression terrain = LB.GetBiomeTerrain(height01 , temp01 , moist01);
-        UpdateTerrainExpression(terrain);
+        // Step 3: Accept with probability based on fit
+        if (UnityEngine.Random.value < fitScore) {
+            // Great fit → use it
+            UpdateTerrainExpression(desired);
+        } else {
+            // Poor fit → try again (up to ~5-10 times max)
+            for (int attempt = 0; attempt < 10; attempt++) {
+                TerrainExpression retry = LB.baseTerrainWeights.GetRandomTerrain();
+                float retryFit = CalculateFitScore(retry , height01);
 
+                if (UnityEngine.Random.value < retryFit) {
+                    UpdateTerrainExpression(retry);
+                    break;
+                }
+            }
+        }
         GetHexInfo();
     }
     public override string GetHexInfo() {
         return $"{myTerrainExpression.ToString()} -----{base.GetHexInfo()}";
 
+    }
+    /// <summary>
+    /// Returns how well a given terrain type fits this tile's environment (0–1).
+    /// 1.0 = perfect fit, 0.0 = very unlikely to be chosen.
+    /// </summary>
+    public float CalculateFitScore(TerrainExpression terrainType , float height01) {
+        float score = 0.5f; // Default neutral chance (can be adjusted)
+
+        switch (terrainType) {
+            // WATER: Loves low elevation, hates high ground
+            case TerrainExpression.WATER_TILE:
+                if (height01 < 0.35f) score = 0.98f;           // Deep ocean = almost certain
+                else if (height01 < 0.45f) score = 0.80f;      // Shallow coast = good
+                else if (height01 > 0.60f) score = 0.10f;      // High ground = very unlikely
+                else score = 0.40f;                            // Mid elevation = rare
+                break;
+
+            // MOUNTAIN: Loves high elevation
+            case TerrainExpression.MOUNTAIN_TILE:
+                if (height01 > 0.75f) score = 0.95f;           // Peaks = perfect
+                else if (height01 > 0.65f) score = 0.75f;      // Hills = good
+                else score = 0.15f;                            // Lowlands = very rare
+                break;
+            // GRASS / PLAINS: Safe fallback, good everywhere
+            case TerrainExpression.GRASS_TILE:
+            case TerrainExpression.DIRT_TILE:
+                score = 0.65f; // Reasonably likely almost everywhere
+                break;
+
+            // Add more biomes here as needed (jungle, swamp, beach, etc.)
+            default:
+                score = 0.50f; // Neutral for unknown types
+                break;
+        }
+
+        return Mathf.Clamp01(score); // Keep it in 0–1 range
     }
 }

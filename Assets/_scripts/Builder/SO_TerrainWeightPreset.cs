@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using UnityEngine;
-
 [CreateAssetMenu(menuName = "Map/Terrain Weight Preset")]
 public class TerrainWeightPreset : ScriptableObject {
     [System.Serializable]
@@ -9,15 +8,14 @@ public class TerrainWeightPreset : ScriptableObject {
         [Range(0f , 100f)]
         public float weight = 10f; // Relative chance
     }
-
     public List<WeightedTerrain> terrains = new List<WeightedTerrain>
-    {
-        new WeightedTerrain { terrain = TerrainExpression.GRASS_TILE, weight = 50 },
-        new WeightedTerrain { terrain = TerrainExpression.DIRT_TILE, weight = 20 },
-        new WeightedTerrain { terrain = TerrainExpression.MOUNTAIN_TILE, weight = 10 },
-        new WeightedTerrain { terrain = TerrainExpression.WATER_TILE, weight = 8 },
-        new WeightedTerrain { terrain = TerrainExpression.FOREST_TILE, weight = 12 }
-    };
+{
+    new WeightedTerrain { terrain = TerrainExpression.GRASS_TILE, weight = 50 },
+    new WeightedTerrain { terrain = TerrainExpression.DIRT_TILE, weight = 20 },
+    new WeightedTerrain { terrain = TerrainExpression.MOUNTAIN_TILE, weight = 10 },
+    new WeightedTerrain { terrain = TerrainExpression.WATER_TILE, weight = 8 },
+    new WeightedTerrain { terrain = TerrainExpression.FOREST_TILE, weight = 12 }
+};
 
     // Precompute for fast runtime selection
     [HideInInspector] public float totalWeight;
@@ -49,3 +47,4 @@ public class TerrainWeightPreset : ScriptableObject {
         return terrains[^1].terrain; // Fallback
     }
 }
+
