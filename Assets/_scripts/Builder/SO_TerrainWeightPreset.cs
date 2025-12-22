@@ -45,6 +45,7 @@ public class TerrainWeightPreset : ScriptableObject {
             if (randomValue < cumulativeWeights[i])
                 return terrains[i].terrain;
         }
+        //c#8 syntax length - 1 = ^1 berry cool
         return terrains[^1].terrain; // Fallback
     }
 }

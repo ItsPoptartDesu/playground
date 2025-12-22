@@ -17,6 +17,11 @@ public class HeightmapSettings : ScriptableObject {
     public float waterThreshold = 0.35f;  // Below this = water
     public float mountainThreshold = 0.75f;
 
+    [Header("Map Type Controls")]
+    public MapType mapType = MapType.Continents;
+    [Range(0f , 1f)] public float wetness = 0.5f; // 0 = dry, 1 = wet
+    public enum MapType { Continents, Pangea, Archipelago, Waterworld }
+
     // Optional seed for reproducible maps
     public int seed = 0;
 }

@@ -8,14 +8,14 @@ public class GameEntry : MonoBehaviour {
     [SerializeField] private LevelBuilder _levelBuilder;
     [SerializeField] private ObjectManager _objectManager;
     [SerializeField] private UIManager myUIManager;
-    private GridManager gridManager; // Inject via Awake/Start
+    [SerializeField] private GridManager myGridManager;
+
     public LevelBuilder GetLevelBuilder() { return _levelBuilder; }
 
     public ObjectManager GetObjectManager() { return _objectManager; }
-    public GridManager GetGridManager() { return gridManager; }
+    public GridManager GetGridManager() { return myGridManager; }
 
-    public int Width = 3;
-    public int Height = 3;
+    public Vector2Int MapSize = Vector2Int.zero;
     // Public property to access the singleton instance
     public static GameEntry Instance {
         get {
@@ -73,9 +73,13 @@ public class GameEntry : MonoBehaviour {
     }
     public void BlowUp() {
         _objectManager.ShutDown();
+        myGridManager.ShutDown();
+        _levelBuilder.perlinHeightMapSettings.seed++;
+        Build();
     }
     public void Build() {
-        Debug.Log($"Game Entry passing W:{Width} - H:{Height}");
-        _levelBuilder.Build(Width , Height);
+        Debug.Log($"Game Entry passing W:{MapSize.x} - H:{MapSize.y}");
+        myGridManager.GenerateMap(MapSize.x , MapSize.y);
+        //_levelBuilder.DecorateMap(MapSize.x , MapSize.y);
     }
 }

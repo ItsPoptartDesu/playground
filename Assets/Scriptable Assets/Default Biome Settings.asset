@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 396282da2b88a714db2ccdeb8a4045b4, type: 3}
+  m_Name: Default Biome Settings
+  m_EditorClassIdentifier: Assembly-CSharp::SO_BiomeSettings
+  temperatureScale: 0.1
+  temperatureOctaves: 4
+  temperaturePersistence: 0.5
+  moistureScale: 0.1
+  moistureOctaves: 5
+  moisturePersistence: 0.1
+  useLatitudeTemperature: 1
+  equatorHeatBonus: 0.3

@@ -12,9 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1414ba67b3686fb48bd685bbade1404c, type: 3}
   m_Name: Default Perlin Map Noise
   m_EditorClassIdentifier: Assembly-CSharp::HeightmapSettings
-  noiseScale: 0.05
+  noiseScale: 0.03
   octaves: 4
-  persistence: 0.5
+  persistence: 0.4
   lacunarity: 2
   heightCurve:
     serializedVersion: 2
@@ -40,7 +40,9 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  maxElevation: 5
+  maxElevation: 10
   waterThreshold: 0.35
   mountainThreshold: 0.7
-  seed: 0
+  mapType: 0
+  wetness: 0
+  seed: 27
