@@ -5,6 +5,8 @@ using System.Drawing;
 using System.Runtime.Serialization;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.LightTransport.PostProcessing;
+using UnityEngine.UI;
 public enum TerrainExpression {
     DIRT_TILE,
     FOREST_TILE,
@@ -22,6 +24,7 @@ public struct HexExpression {
 }
 
 public class HexTile : ObjectTags, ISelectable {
+    public TextMesh DebugText;
     [Header("Selectable")]
     [SerializeField] private UnityEvent onSelectedEvent; // Inspector-hookable for highlights
     [SerializeField] private Renderer highlightRenderer; // e.g., outline material
@@ -34,11 +37,16 @@ public class HexTile : ObjectTags, ISelectable {
     public int height = 0; // Stacked tiles increase this
     public GameObject heldObject; // Unit or stacked tile (check type)
     public TileEffectData effectData; // Assign in Inspector/prefab
-    public bool IsOccupied => heldObject != null && !IsStackable(heldObject); // Can't move to occupied
-    private bool IsStackable(GameObject obj) => obj.GetComponent<HexTile>() != null; // Allow stacking tiles for height
     public int q, r;
     [SerializeField] ParticleSystem onSelectParticles;
     [SerializeField] Transform UnitAttachPoint;
+    [HideInInspector] public List<HexTile> CachedNeighbors; // Add this!
+
+    public bool IsOccupied => heldObject != null && !IsStackable(heldObject); // Can't move to occupied
+    private bool IsStackable(GameObject obj) => obj.GetComponent<HexTile>() != null; // Allow stacking tiles for height
+    public TerrainExpression GetTerrainExpression() { return myTerrainExpression; }
+    public bool IsWater() { return myTerrainExpression == TerrainExpression.WATER_TILE; }
+
     #region Selectable
     public void OnSelect(UnityEvent customEvent = null) {
         // Visual: Enable highlight
@@ -48,22 +56,19 @@ public class HexTile : ObjectTags, ISelectable {
         onSelectedEvent?.Invoke(); // e.g., Show move range via GridManager
         customEvent?.Invoke();
         var tiles = GameEntry.Instance.GetGridManager().GetNeighbors(this);
-        foreach(var t in tiles) {
-            Debug.Log($"{t.GetHexInfo()}");
-            //t.onSelectParticles.Play();
-            //t.onSelectedEvent?.Invoke();
-            //customEvent?.Invoke();
+        foreach (var t in tiles) {
+            //Debug.Log($"{t.GetHexInfo()}");
+            t.onSelectParticles.Play();
+            t.onSelectedEvent?.Invoke();
+            customEvent?.Invoke();
         }
-            
     }
-
     public void OnDeselect() {
         Debug.Log($"{GetHexInfo()} : has been deselected on");
         if (highlightRenderer != null)
             onSelectParticles.Stop();
     }
     #endregion
-    public bool IsWater() { return myTerrainExpression == TerrainExpression.WATER_TILE; }
     public float GetMoveCost(HeroStats mover , HexTile fromTile) {
         float baseCost = 1f; // Default hex distance
         if (effectData != null) {
@@ -86,7 +91,6 @@ public class HexTile : ObjectTags, ISelectable {
         //    unit.TakeDamage(effectData.damagePerTurn); // DoT
         // Future: Slow (reduce unit speed temp), etc.
     }
-    public TerrainExpression GetTerrainExpression() { return myTerrainExpression; }
     public void UpdateTerrainExpression(TerrainExpression _type) {
         myTerrainExpression = _type;
         GetComponentInChildren<MeshRenderer>().sharedMaterial = GameEntry.Instance.GetObjectManager().GetHexTileMaterial(_type);
@@ -95,7 +99,11 @@ public class HexTile : ObjectTags, ISelectable {
         transform.position = pos;
         transform.rotation = Quaternion.identity;
         SetHexInfo(x , y , z);
-
+        q = x;
+        r = z;
+        CachedNeighbors = new List<HexTile>(6); // Pre-allocate
+        var tempstring = $"Q:{x} @ R:{z}";
+        DebugText.text = tempstring.Replace("@" , System.Environment.NewLine);
         //TODO check if LB stores mapsize if not paass it along when you start the game.
         LevelBuilder LB = GameEntry.Instance.GetLevelBuilder();
         var ms = GameEntry.Instance.MapSize;
@@ -111,14 +119,11 @@ public class HexTile : ObjectTags, ISelectable {
 
         // Step 3: Accept with probability based on fit
         if (UnityEngine.Random.value < fitScore) {
-            // Great fit → use it
             UpdateTerrainExpression(desired);
         } else {
-            // Poor fit → try again (up to ~5-10 times max)
             for (int attempt = 0; attempt < 10; attempt++) {
                 TerrainExpression retry = LB.baseTerrainWeights.GetRandomTerrain();
                 float retryFit = CalculateFitScore(retry , height01);
-
                 if (UnityEngine.Random.value < retryFit) {
                     UpdateTerrainExpression(retry);
                     break;
@@ -128,7 +133,7 @@ public class HexTile : ObjectTags, ISelectable {
         GetHexInfo();
     }
     public override string GetHexInfo() {
-        return $"{myTerrainExpression.ToString()} -----{base.GetHexInfo()}";
+        return $"{myTerrainExpression.ToString()} ----- {base.GetHexInfo()}";
 
     }
     /// <summary>

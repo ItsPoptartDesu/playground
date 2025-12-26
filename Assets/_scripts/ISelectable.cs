@@ -7,5 +7,4 @@ public interface ISelectable
     void OnSelect(UnityEvent onSelectedEvent = null); // Trigger visuals/UI (e.g., highlight)
     void OnDeselect();
     Vector3 WorldPosition { get; } // For UI world-space pointers
-    // Optional: GetComponent<Unit>() for type-specific actions
 }

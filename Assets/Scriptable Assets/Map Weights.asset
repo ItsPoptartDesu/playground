@@ -14,12 +14,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::TerrainWeightPreset
   terrains:
   - terrain: 0
-    weight: 30
+    weight: 20
   - terrain: 5
-    weight: 0
+    weight: 10
   - terrain: 2
     weight: 30
   totalWeight: 60
   cumulativeWeights:
+  - 20
   - 30
   - 60

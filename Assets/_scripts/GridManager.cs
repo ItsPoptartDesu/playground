@@ -1,31 +1,54 @@
-using UnityEngine;
+﻿using UnityEngine;
 using System.Collections.Generic;
 using Unity.IO.LowLevel.Unsafe;
+using UnityEngine.TerrainUtils;
 
 public class GridManager : MonoBehaviour {
     private Dictionary<Vector2Int , HexTile> grid = new(); // Key: axial (q,r)
-    private static readonly Vector2Int[] HexDirections = // Flat-top neighbors
-    {
-        new(1, 0), new(1, -1), new(0, -1),
-        new(-1, 0), new(-1, 1), new(0, 1)
-    };
     public Dictionary<Vector2Int , HexTile> GetMap() { return grid; }
     private float hexSize;
+    // Odd-r offset flat-top hex neighbor offsets
+    private static readonly Vector2Int[] EvenRowDirections = new Vector2Int[]
+    {
+        new(1,  0), new(1, -1), new(0, -1),
+        new(-1, 0), new(0,  1), new(1,  1)
+    };
+
+    private static readonly Vector2Int[] OddRowDirections = new Vector2Int[]
+    {
+        new(1,  0), new(0, -1), new(-1, -1),
+        new(-1, 0), new(-1,  1), new(0,  1)
+    };
+    private static readonly Vector2Int[][] DirectionLookup = new[] { OddRowDirections , EvenRowDirections };
 
     public void GenerateMap(int _width , int _height) {
         ObjectManager OM = GameEntry.Instance.GetObjectManager();
         GameObject SpawnedHexTile = null;
         HexTile h;
         float y = 0f;
-        var ms = GameEntry.Instance.MapSize;
-        for (int i = 0; i < ms.x; i++) {
-            for (int j = 0; j < ms.y; j++) {
+        List<HexTile> allTiles = new List<HexTile>(_width * _height);
+
+        for (int i = 0; i < _width; i++) {
+            for (int j = 0; j < _height; j++) {
                 SpawnedHexTile = OM.CreateNewHexTile();
                 h = SpawnedHexTile.GetComponent<HexTile>();
                 hexSize = OM.GetHexSize();
                 Vector3 pos = GetHexWorldPosition(i , y , j);
                 h.Initialize(pos , i , (int)y , j);
                 grid.Add(new Vector2Int(i , j) , h);
+                allTiles.Add(h);
+            }
+        }
+        // === NEIGHBOR CACHING PHASE ===
+        foreach (HexTile tile in allTiles) {
+            Vector2Int pos = new Vector2Int(tile.q , tile.r);
+            var directions = DirectionLookup[pos.y % 2]; //& 1 is faster
+
+            foreach (Vector2Int dir in directions) {
+                Vector2Int neighborKey = pos + dir;
+                if (grid.TryGetValue(neighborKey , out HexTile neighbor)) {
+                    tile.CachedNeighbors.Add(neighbor);
+                }
             }
         }
     }
@@ -92,13 +115,7 @@ public class GridManager : MonoBehaviour {
     }
     //TODO save and store neighbors affter map build
     public List<HexTile> GetNeighbors(HexTile tile) {
-        var neighbors = new List<HexTile>();
-        foreach (var dir in HexDirections) {
-            Vector2Int neighborPos = new(tile.q + dir.x , tile.r + dir.y);
-            if (grid.TryGetValue(neighborPos , out HexTile neighbor))
-                neighbors.Add(neighbor);
-        }
-        return neighbors;
+        return tile.CachedNeighbors;
     }
     public void ShutDown() {
         Debug.Log("GridManager Shutting down");
