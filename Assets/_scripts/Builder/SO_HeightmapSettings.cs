@@ -1,4 +1,3 @@
-// File: HeightmapSettings.asset
 using UnityEngine;
 
 [CreateAssetMenu(menuName = "Map/Heightmap Settings")]

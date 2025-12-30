@@ -62,7 +62,7 @@ public class GridManager : MonoBehaviour {
         float newZ = z * (hexSize * Mathf.Sqrt(3f) / 2f);
         return new Vector3(newX , y , newZ);
     }
-    public List<HexTile> FindPath(HexTile start , HexTile goal , HeroStats mover) {
+    public List<HexTile> FindPath(HexTile start , HexTile goal , UnitData mover) {
         if (start == null || goal == null || goal.IsOccupied) return null;
 
         var openSet = new BinaryHeap<HexTile>();
@@ -97,7 +97,6 @@ public class GridManager : MonoBehaviour {
         }
         return null; // No path
     }
-
     private float Heuristic(HexTile a , HexTile b) {
         // Cube distance for hex: Convert axial to cube
         int ax = a.q, ay = a.r, az = -a.q - a.r;
@@ -121,7 +120,7 @@ public class GridManager : MonoBehaviour {
         Debug.Log("GridManager Shutting down");
         grid.Clear();
     }
-    private bool IsValidMove(HeroStats mover , HexTile from , HexTile to) {
+    private bool IsValidMove(UnitData mover , HexTile from , HexTile to) {
         // Add one-way checks here if in TileEffectData
         return true; // Extend for unit-specific (e.g., flying)
     }

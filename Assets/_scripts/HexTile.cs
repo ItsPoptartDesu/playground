@@ -69,7 +69,7 @@ public class HexTile : ObjectTags, ISelectable {
             onSelectParticles.Stop();
     }
     #endregion
-    public float GetMoveCost(HeroStats mover , HexTile fromTile) {
+    public float GetMoveCost(UnitData mover , HexTile fromTile) {
         float baseCost = 1f; // Default hex distance
         if (effectData != null) {
             baseCost *= effectData.moveCostMultiplier; // Slow/speed
@@ -79,17 +79,17 @@ public class HexTile : ObjectTags, ISelectable {
 
         // Height cost: Delta height * climb penalty (unless flying)
         int heightDelta = height - fromTile.height;
-        if (heightDelta > 0 && heightDelta > mover.CurrentClimbDistance)
-            return Mathf.Infinity; // Too steep
+        //TODO climbing
+        //if (heightDelta > 0 && heightDelta > mover.CurrentClimbDistance)
+        //    return Mathf.Infinity; // Too steep
         baseCost += heightDelta > 0 ? heightDelta * 0.5f : 0f; // Extra cost for climbing
 
         return baseCost;
     }
-    public void ApplyEffects(Hero unit) {
+    public void ApplyEffects(Unit _unit) {
         if (effectData == null) return;
-        //if (effectData.damagePerTurn > 0)
-        //    unit.TakeDamage(effectData.damagePerTurn); // DoT
-        // Future: Slow (reduce unit speed temp), etc.
+        Debug.Log($"{_unit.myUnitData.myName} was hit with {effectData.name}");
+        return;
     }
     public void UpdateTerrainExpression(TerrainExpression _type) {
         myTerrainExpression = _type;

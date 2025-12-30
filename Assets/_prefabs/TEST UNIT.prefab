@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 948777403243986971}
   - component: {fileID: 2579826329405081493}
   - component: {fileID: 1328984413345193029}
-  - component: {fileID: 1580248797930658223}
+  - component: {fileID: -5256456961550619005}
   m_Layer: 0
   m_Name: TEST UNIT
   m_TagString: Untagged
@@ -63,6 +63,8 @@ MeshRenderer:
   m_RayTracingAccelStructBuildFlagsOverride: 0
   m_RayTracingAccelStructBuildFlags: 1
   m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -84,9 +86,11 @@ MeshRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+  m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
 --- !u!135 &1328984413345193029
 SphereCollider:
@@ -109,7 +113,7 @@ SphereCollider:
   serializedVersion: 3
   m_Radius: 0.5
   m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &1580248797930658223
+--- !u!114 &-5256456961550619005
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -118,9 +122,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 196035148807067404}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6a5d27dfc941e164385d59ae6c5891f7, type: 3}
+  m_Script: {fileID: 11500000, guid: 8219e03acc0c0504ba17ed22a38814cc, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: 
+  m_EditorClassIdentifier: Assembly-CSharp::Unit
   expr: 1
   ObjName: 
   id: {x: 0, y: 0, z: 0}
+  myUnitData: {fileID: 11400000, guid: cd711ff467a969746a04986b713dcc14, type: 2}
+  myCurrentHp: 0
+  myTile: {fileID: 0}
+  myCurrentMovement: 0

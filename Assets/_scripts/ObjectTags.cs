@@ -6,7 +6,7 @@ namespace ObjectTag
     public enum ObjExpression
     {
         HEXTILE,
-        HERO,
+        UNIT,
         UNDEFINED,
     }
 

@@ -1,8 +1,5 @@
-using ObjectTag;
 using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
-using static HeightmapSettings;
 
 public class LevelBuilder : MonoBehaviour {
     public TerrainWeightPreset baseTerrainWeights;

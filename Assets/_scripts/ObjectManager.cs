@@ -39,11 +39,11 @@ public class ObjectManager : MonoBehaviour {
             int moveD = UnityEngine.Random.Range(1 , 5);
             int climbD = UnityEngine.Random.Range(0 , 2);
 
-            newlySpawned.GetComponent<Hero>().Initiate(name , moveD , climbD);
-            if (!ObjectsInScene.ContainsKey(ObjExpression.HERO))
-                ObjectsInScene[ObjExpression.HERO] = new List<GameObject> { newlySpawned };
+            newlySpawned.GetComponent<Unit>().Initiate();
+            if (!ObjectsInScene.ContainsKey(ObjExpression.UNIT))
+                ObjectsInScene[ObjExpression.UNIT] = new List<GameObject> { newlySpawned };
             else
-                ObjectsInScene[ObjExpression.HERO].Add(newlySpawned);
+                ObjectsInScene[ObjExpression.UNIT].Add(newlySpawned);
 
             return;
         }
