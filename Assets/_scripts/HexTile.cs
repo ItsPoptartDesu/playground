@@ -55,7 +55,7 @@ public class HexTile : ObjectTags, ISelectable {
             onSelectParticles.Play();
         onSelectedEvent?.Invoke(); // e.g., Show move range via GridManager
         customEvent?.Invoke();
-        var tiles = GameEntry.Instance.GetGridManager().GetNeighbors(this);
+        var tiles = GameEntry.Instance.GetLevelBuilder().GetGridManager().GetNeighbors(this);
         foreach (var t in tiles) {
             //Debug.Log($"{t.GetHexInfo()}");
             t.onSelectParticles.Play();

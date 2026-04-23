@@ -1,10 +1,13 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class LevelBuilder : MonoBehaviour {
     public TerrainWeightPreset baseTerrainWeights;
     public HeightmapSettings perlinHeightMapSettings;
     private System.Random pseudoRandom;
+    [SerializeField] private GridManager myGridManager;
+    public GridManager GetGridManager() { return myGridManager; }
     public float GetElevationStepHeight() => 1f; // or expose as public field
     void Awake() {
         if (baseTerrainWeights != null)
@@ -19,8 +22,15 @@ public class LevelBuilder : MonoBehaviour {
             ? baseTerrainWeights.GetRandomTerrain()
             : TerrainExpression.GRASS_TILE;
     }
-    public void DecorateMap(int _w , int _h) {
-        SmoothCoastlines();
+    public void BuildMap(int _w , int _h) {
+        myGridManager.GenerateMap(_w , _h);
+        DecorateMap(_w , _h);
+    }
+    public void ShutdownMap() {
+        myGridManager.ShutDown();
+    }
+    private void DecorateMap(int _w , int _h) {
+        //SmoothCoastlines();
         //generate Rivers
         //add towns
         //add map resources
@@ -55,10 +65,10 @@ public class LevelBuilder : MonoBehaviour {
     public void SmoothCoastlines(int iterations = 4) {
         for (int i = 0; i < iterations; i++) {
             Dictionary<HexTile , int> waterNeighborCounts = new();
-            var allTiles = GameEntry.Instance.GetGridManager().GetMap();
+            var allTiles = GameEntry.Instance.GetLevelBuilder().GetGridManager().GetMap();
             foreach (HexTile tile in allTiles.Values) {
                 if (!tile.IsWater()) continue;
-                var n = GameEntry.Instance.GetGridManager().GetNeighbors(tile);
+                var n = GameEntry.Instance.GetLevelBuilder().GetGridManager().GetNeighbors(tile);
                 foreach (HexTile neighbor in n) {
                     if (waterNeighborCounts.ContainsKey(neighbor))
                         waterNeighborCounts[neighbor]++;

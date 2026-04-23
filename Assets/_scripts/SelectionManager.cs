@@ -1,28 +1,34 @@
-using System;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using static UnityEngine.CullingGroup;
 public enum SelectionState
 {
-    Idle,           // Nothing selected�ready for hex click
+    Idle,           // Nothing selected—ready for hex click
     TileSelected,   // Hex picked; show move/attack highlights if unit present
     UnitSelected    // Unit on hex picked; show actions (move, attack, info)
 }
-public class PlayerController : MonoBehaviour
+public class SelectionManager : MonoBehaviour
 {
+    public static SelectionManager Instance;
     [Header("Selection Manager")]
     [SerializeField] public uint moveSelected = 0;
     [SerializeField] private LayerMask tileLayerMask = 1 << 6; // e.g., Layer 6 = "HexTiles"
     [SerializeField] private LayerMask unitLayerMask = 1 << 7; // Layer 7 = "Units"
     [SerializeField] private Camera mainCamera; // Scene camera
+    private Unit mySelectedUnit;
+    private Faction myCurrentFaction;
+
     public SelectionState CurrentState { get; private set; } = SelectionState.Idle;
     public ISelectable CurrentSelection { get; private set; }
     public ISelectable[] CurrentSelections;
     // Events: Publishers for subscribers (UI, GameManager, etc.)
     public static event Action<SelectionState> OnStateChanged;
     public static event Action<ISelectable> OnSelectionChanged;
-    public static event Action OnDeselected;
+    public static event Action OnDeselected; 
+    private List<UnitStateMachine> allUnitStates = new List<UnitStateMachine>();
     public void ToggleMove(uint _state)
     {
         moveSelected = _state;
@@ -34,38 +40,21 @@ public class PlayerController : MonoBehaviour
     public InputAction PTesting;
     public InputAction OTesting;
 
+    #region unity functions
     private void Awake()
     {
         playerInput = new InputSystem_Actions();
         mainCamera ??= Camera.main;
-
     }
-    private void OnDisable()
-    {
-        playerInput.Disable();
-        playerInput.Testing.Click.performed -= OnClick;
-
-        PTesting.Disable();
-        PTesting.performed -= BuildLevel;
-        PTesting = null;
-
-        OTesting.Disable();
-        OTesting.performed -= BlowUpLevel;
-        OTesting = null;
-
-        playerInput.Testing.Click.performed -= OnClick;
-        playerInput.Testing.Deselect.performed -= _ => DeselectAll();
-    }
-    private void OnEnable()
-    {
+    public void OnEnable() {
         playerInput.Enable();
         OTesting = playerInput.Testing.BlowUp;
         OTesting.Enable();
-        OTesting.performed += BlowUpLevel;
+        OTesting.performed += GameEntry.Instance.EndGame;
 
         PTesting = playerInput.Testing.BuildLevel;
         PTesting.Enable();
-        PTesting.performed += BuildLevel;
+        PTesting.performed += GameEntry.Instance.StartGame;
 
         playerInput.Testing.Click.performed += OnClick;
         playerInput.Testing.Deselect.performed += _ => DeselectAll();
@@ -73,8 +62,27 @@ public class PlayerController : MonoBehaviour
 
         playerInput.Testing.Spawn.performed += SpawnPlayable;
     }
+    public void OnDisable() {
+        playerInput.Disable();
+        playerInput.Testing.Click.performed -= OnClick;
+
+        PTesting.Disable();
+        PTesting.performed -= GameEntry.Instance.StartGame;
+        PTesting = null;
+
+        OTesting.Disable();
+        OTesting.performed -= GameEntry.Instance.EndGame;
+        OTesting = null;
+
+        playerInput.Testing.Click.performed -= OnClick;
+        playerInput.Testing.Deselect.performed -= _ => DeselectAll();
+    }
+    #endregion
 
     #region Selection
+    public void RegisterUnit(UnitStateMachine stateMachine) {
+        allUnitStates.Add(stateMachine);
+    }
     private void SpawnPlayable(InputAction.CallbackContext context)
     {
         GameEntry.Instance.GetObjectManager().SpawnPlayableUnit(null);
@@ -82,16 +90,8 @@ public class PlayerController : MonoBehaviour
     private void OnClick(InputAction.CallbackContext context)
     {
         Debug.Log("PlayerController OnClick");
-        HandleGenericClick();
-        //if (CurrentState == SelectionState.Idle || CurrentState == SelectionState.TileSelected)
-        //{
-        //    HandleHexClick();
-        //}
-        //else if (CurrentState == SelectionState.UnitSelected)
-        //{
-        //    // For unit actions: Raycast for targets (e.g., enemy hex/unit)
-        //    HandleActionClick();
-        //}
+        //HandleGenericClick();
+        HandleClick();
     }
     public void HandleGenericClick()
     {
@@ -135,21 +135,84 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    private void HandleActionClick()
+    private void HandleClick()
     {
-        // Example: If unit selected, raycast for move/attack targets
-        // This would use highlights from prior selection (e.g., valid hexes)
-        // For now, stub: Deselect on off-target click
-        if (!Physics.Raycast(mainCamera.ScreenPointToRay(Mouse.current.position.ReadValue()) , out RaycastHit hit , Mathf.Infinity , tileLayerMask | unitLayerMask))
-        {
-            DeselectAll();
+        Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
+        RaycastHit[] hits = Physics.RaycastAll(ray);
+
+        // Sort by layer priority: Units first
+        hits = hits.OrderBy(h => h.collider.gameObject.layer).ToArray();
+
+        foreach (RaycastHit hit in hits) {
+            if (((1 << hit.collider.gameObject.layer) & unitLayerMask) != 0) {
+                Unit unit = hit.collider.GetComponent<Unit>();
+                if (unit && unit.myOwner == myCurrentFaction) { // Your faction only
+                    SelectUnit(unit);
+                    return; // Stop here - unit selected
+                }
+            }
+        }
+
+        // No unit hit → check ground
+        foreach (RaycastHit hit in hits) {
+            if (((1 << hit.collider.gameObject.layer) & tileLayerMask) != 0) {
+                HexTile targetTile = hit.collider.GetComponent<HexTile>();
+                if (targetTile && mySelectedUnit != null) {
+                    //TryMoveOrAttack(targetTile);
+                    return;
+                }
+            }
+        }
+    }
+    public void SelectUnit(Unit unit) {
+        if (mySelectedUnit == unit) {
+            DeselectUnit();
             return;
         }
 
-        // Logic for move/attack: e.g., if hit is valid target, invoke Unit.MoveTo(hitTile)
-        // Broadcast event: OnActionPerformed(newSelection, hit.collider.GetComponent<ISelectable>());
-    }
+        // Deselect previous directly
+        if (mySelectedUnit != null) {
+            mySelectedUnit.GetComponent<UnitStateMachine>().SetState(UnitState.Friendly);
+        }
 
+        mySelectedUnit = unit;
+        unit.GetComponent<UnitStateMachine>().SetState(UnitState.Selected);
+
+        //ShowMovementRange(unit);
+    }
+    public void DeselectUnit() {
+        if (mySelectedUnit != null) {
+            var stateMachine = mySelectedUnit.GetComponent<UnitStateMachine>();
+            stateMachine.SetState(
+                mySelectedUnit.myOwner == myCurrentFaction
+                    ? UnitState.Friendly
+                    : UnitState.Hostile
+            );
+            mySelectedUnit = null;
+        }
+        //ClearRangeOverlays();
+    }
+    // Called by TurnManager when turn changes
+    public void OnTurnChanged(Faction newFaction) {
+        myCurrentFaction = newFaction;
+
+        // ONLY refresh visuals — no events
+        foreach (var stateMachine in allUnitStates) {
+            Unit unit = stateMachine.GetComponent<Unit>();
+            if (unit == mySelectedUnit) continue; // Selected overrides
+
+            stateMachine.SetState(
+                unit.myOwner == myCurrentFaction
+                    ? UnitState.Friendly
+                    : UnitState.Hostile
+            );
+        }
+
+        // Deselect if selected unit no longer belongs to current player
+        if (mySelectedUnit != null && mySelectedUnit.myOwner != myCurrentFaction) {
+            DeselectUnit();
+        }
+    }
     private void Select(ISelectable selectable)
     {
         if (CurrentSelections[moveSelected] != null)
@@ -181,25 +244,5 @@ public class PlayerController : MonoBehaviour
         moveSelected = 0;
     }
     #endregion
-    private void BuildLevel(InputAction.CallbackContext context)
-    {
-        Debug.Log("Player Wants to build a level");
-        GameEntry.Instance.Build();
-    }
-    private void BlowUpLevel(InputAction.CallbackContext context)
-    {
-        Debug.Log("Player Wants to Destroy the level");
-        GameEntry.Instance.BlowUp();
-    }
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
-
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        //playerInput.ReadValue<>
-    }
+   
 }

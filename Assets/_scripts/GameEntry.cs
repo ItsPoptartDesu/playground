@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class GameEntry : MonoBehaviour {
     // Static instance for singleton pattern
@@ -8,12 +9,9 @@ public class GameEntry : MonoBehaviour {
     [SerializeField] private LevelBuilder _levelBuilder;
     [SerializeField] private ObjectManager _objectManager;
     [SerializeField] private UIManager myUIManager;
-    [SerializeField] private GridManager myGridManager;
-    [SerializeField] private bool UseSeed = false;
     public LevelBuilder GetLevelBuilder() { return _levelBuilder; }
 
     public ObjectManager GetObjectManager() { return _objectManager; }
-    public GridManager GetGridManager() { return myGridManager; }
 
     public Vector2Int MapSize = Vector2Int.zero;
     // Public property to access the singleton instance
@@ -71,17 +69,14 @@ public class GameEntry : MonoBehaviour {
             _applicationIsQuitting = true;
         }
     }
-    public void BlowUp() {
+    public void EndGame(InputAction.CallbackContext context) {
         _objectManager.ShutDown();
-        myGridManager.ShutDown();
-        _levelBuilder.perlinHeightMapSettings.seed++;
-        Build();
+        _levelBuilder.ShutdownMap();
+        StartGame(new InputAction.CallbackContext());
     }
-    public void Build() {
+    public void StartGame(InputAction.CallbackContext context) {
         Debug.Log($"Game Entry passing W:{MapSize.x} - H:{MapSize.y}");
-        if (!UseSeed)
-            _levelBuilder.perlinHeightMapSettings.seed = 0;
-        myGridManager.GenerateMap(MapSize.x , MapSize.y);
+        _levelBuilder.BuildMap(MapSize.x , MapSize.y);
         //_levelBuilder.DecorateMap(MapSize.x , MapSize.y);
     }
 }

@@ -851,9 +851,7 @@ MonoBehaviour:
   _levelBuilder: {fileID: 1949285950}
   _objectManager: {fileID: 1949285948}
   myUIManager: {fileID: 1361728408}
-  myGridManager: {fileID: 1949285951}
-  UseSeed: 0
-  MapSize: {x: 16, y: 16}
+  MapSize: {x: 5, y: 5}
 --- !u!1 &832575517
 GameObject:
   m_ObjectHideFlags: 0
@@ -1641,6 +1639,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   baseTerrainWeights: {fileID: 11400000, guid: e3393c7be32c18546ba10a267f2cb88a, type: 2}
   perlinHeightMapSettings: {fileID: 11400000, guid: f881263a505510044a240e87ae77932a, type: 2}
+  myGridManager: {fileID: 1949285951}
 --- !u!114 &1949285951
 MonoBehaviour:
   m_ObjectHideFlags: 0

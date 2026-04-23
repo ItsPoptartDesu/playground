@@ -2,6 +2,7 @@ using ObjectTag;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using Unity.Mathematics;
 using UnityEngine;
 
@@ -35,16 +36,15 @@ public class ObjectManager : MonoBehaviour {
             GameObject TileParent = Tiles[RandomTileIndex];
             GameObject newlySpawned = Instantiate(TestHero , TileParent.transform);
             Tiles[RandomTileIndex].GetComponent<HexTile>().heldObject = newlySpawned;
-            string name = RandomString(7);
             int moveD = UnityEngine.Random.Range(1 , 5);
             int climbD = UnityEngine.Random.Range(0 , 2);
-
-            newlySpawned.GetComponent<Unit>().Initiate();
+            Faction owner = new Faction();
+            newlySpawned.GetComponent<Unit>().Initiate( owner);
             if (!ObjectsInScene.ContainsKey(ObjExpression.UNIT))
                 ObjectsInScene[ObjExpression.UNIT] = new List<GameObject> { newlySpawned };
             else
                 ObjectsInScene[ObjExpression.UNIT].Add(newlySpawned);
-
+            SelectionManager.Instance?.RegisterUnit(newlySpawned.GetComponent<UnitStateMachine>());
             return;
         }
     }

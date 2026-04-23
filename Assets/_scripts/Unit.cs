@@ -10,6 +10,7 @@ public class Unit : ObjectTags, ISelectable
     public int myCurrentHp;
     public HexTile myTile;
     public int myCurrentMovement;
+    public Faction myOwner;
     public bool IsSelectable => throw new System.NotImplementedException();
 
     public Vector3 WorldPosition => throw new System.NotImplementedException();
@@ -25,7 +26,7 @@ public class Unit : ObjectTags, ISelectable
         Debug.Log($"{myUnitData}");
     }
     public void MoveTo(HexTile target) {
-        List<HexTile> path = GameEntry.Instance.GetGridManager().FindPath(myTile , target , myUnitData);
+        List<HexTile> path = GameEntry.Instance.GetLevelBuilder().GetGridManager().FindPath(myTile , target , myUnitData);
         if (path == null || path.Count > myUnitData.myMovement + 1) return; // +1 for start tile
 
         // Animate along path (e.g., coroutine with Lerp)
@@ -41,9 +42,10 @@ public class Unit : ObjectTags, ISelectable
         }
         myCurrentMovement -= path.Count - 1; // Deduct moves
     }
-    public void Initiate() {
+    public void Initiate(Faction _owner) {
         myCurrentHp = myUnitData.myHP;
         myCurrentMovement = myUnitData.myMovement;
         this.name = myUnitData.myName;
+        myOwner = _owner;
     }
 }

@@ -13,7 +13,9 @@ GameObject:
   - component: {fileID: 2579826329405081493}
   - component: {fileID: 1328984413345193029}
   - component: {fileID: -5256456961550619005}
-  m_Layer: 0
+  - component: {fileID: 129775919367549566}
+  - component: {fileID: -3300581463035862193}
+  m_Layer: 7
   m_Name: TEST UNIT
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -132,3 +134,32 @@ MonoBehaviour:
   myCurrentHp: 0
   myTile: {fileID: 0}
   myCurrentMovement: 0
+  myOwner: {fileID: 0}
+--- !u!114 &129775919367549566
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 196035148807067404}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5941cad9ff9522b42a2e96b5c8d19108, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::UnitStateMachine
+  config: {fileID: 11400000, guid: 7499230e8cf99a44a9da5fc64f91d20d, type: 2}
+--- !u!114 &-3300581463035862193
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 196035148807067404}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e19747de3f5aca642ab2be37e372fb86, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Outline
+  m_EffectColor: {r: 0, g: 0, b: 0, a: 0.5}
+  m_EffectDistance: {x: 1, y: -1}
+  m_UseGraphicAlpha: 1

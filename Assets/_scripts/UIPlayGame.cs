@@ -34,11 +34,11 @@ public class UIPlayGame : MonoBehaviour
     }
     private void OnEnable()
     {
-        PlayerController.OnStateChanged += UpdateUIForState;
-        PlayerController.OnSelectionChanged += UpdateUIForSelection;
-        PlayerController.OnDeselected += HideAllPanels;
+        SelectionManager.OnStateChanged += UpdateUIForState;
+        SelectionManager.OnSelectionChanged += UpdateUIForSelection;
+        SelectionManager.OnDeselected += HideAllPanels;
         //infoButton.onClick.AddListener(infoButtonOnClick);
-        PlayerController pc = FindAnyObjectByType<PlayerController>();
+        SelectionManager pc = FindAnyObjectByType<SelectionManager>();
         
     }
     private void infoButtonOnClick()
@@ -48,7 +48,7 @@ public class UIPlayGame : MonoBehaviour
 
     private void OnDisable()
     {
-        PlayerController.OnStateChanged -= UpdateUIForState;
+        SelectionManager.OnStateChanged -= UpdateUIForState;
         // ... unsubscribe others
     }
 
